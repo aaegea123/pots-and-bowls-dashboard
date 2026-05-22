@@ -67,60 +67,92 @@
   #chatSuggestions{display:flex;flex-wrap:wrap;gap:.3rem;padding:.35rem .55rem .55rem;}
   .chat-sugg{font-size:.7rem;background:#f0fdf4;border:1px solid #86efac;border-radius:999px;padding:.2rem .6rem;cursor:pointer;color:#166534;transition:background .15s;}
   .chat-sugg:hover{background:#dcfce7;}
+  /* Nav tabs — desktop: auto width; mobile: even 2-column grid */
+  .nav-tab{padding:.4rem .9rem;border-radius:8px;font-size:.8rem;font-weight:500;flex:1;min-width:calc(50% - .375rem);text-align:center;}
+  @media(min-width:640px){
+    .nav-tab{flex:0 0 auto;min-width:unset;font-size:.875rem;padding:.5rem 1rem;}
+  }
+  /* Slightly tighter card padding on mobile */
+  @media(max-width:639px){
+    .card{padding:.9rem;}
+    main{padding-left:.75rem;padding-right:.75rem;}
+  }
+  /* ── Chatbot mobile fixes ─────────────────────────────── */
+  @media(max-width:639px){
+    /* Widget closer to corner so panel has more room */
+    #chatWidget{right:.75rem;bottom:.75rem;}
+    /* Panel becomes fixed & full-width on mobile — no more clipping */
+    #chatPanel{
+      position:fixed;
+      bottom:72px;
+      left:.75rem;
+      right:.75rem;
+      width:auto;
+      max-width:none;
+      border-radius:14px;
+    }
+    /* Slightly shorter message area to leave room for keyboard */
+    #chatMessages{height:220px;}
+    /* Suggestion chips: smaller & tighter so they wrap in 2 per row */
+    .chat-sugg{font-size:.68rem;padding:.18rem .55rem;}
+    #chatSuggestions{gap:.25rem;padding:.3rem .5rem .45rem;}
+    /* Make send button easier to tap */
+    #chatSendBtn{padding:.42rem .85rem;font-size:.82rem;}
+  }
 </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
 <!-- Encabezado -->
-<header style="background:var(--pb-dark)" class="text-white px-6 py-3 flex items-center justify-between flex-shrink-0">
-  <div class="flex items-center gap-3">
-    <a href="landing.html"><img src="pab_company_logo.png" alt="Pots &amp; Bowls" style="height:46px;"/></a>
-    <span class="text-green-300 text-lg font-bold" style="letter-spacing:.01em;">Panel de Inteligencia</span>
+<header style="background:var(--pb-dark)" class="text-white px-4 py-3 flex items-center gap-3 flex-shrink-0">
+  <a href="landing.html" class="flex-shrink-0"><img src="pab_company_logo.png" alt="Pots &amp; Bowls" style="height:40px;"/></a>
+  <div class="min-w-0">
+    <div class="text-green-300 font-bold leading-tight" style="font-size:clamp(.85rem,4vw,1.1rem);letter-spacing:.01em;">Panel de Inteligencia</div>
+    <div class="text-green-400 leading-tight mt-0.5 truncate" style="font-size:clamp(.65rem,2.5vw,.75rem);" id="metaLine"></div>
   </div>
-  <div class="text-xs text-green-300" id="metaLine"></div>
 </header>
 
 <!-- Barra de filtros combinada -->
-<div class="bg-white border-b px-4 py-2 flex flex-wrap items-center gap-x-5 gap-y-2 flex-shrink-0">
-  <!-- Ubicación -->
+<div class="bg-white border-b px-4 pt-2 pb-3 flex flex-col gap-2 flex-shrink-0">
+  <!-- Fila 1: Ubicación -->
   <div class="flex items-center gap-2 flex-wrap">
-    <span class="text-xs font-semibold text-gray-500">Ubicación:</span>
+    <span class="text-xs font-semibold text-gray-500 flex-shrink-0">Ubicación:</span>
     <button onclick="setLoc('All')"          class="loc-btn px-3 py-1 rounded-full text-xs font-medium border">Todas</button>
     <button onclick="setLoc('Rohrmoser')"    class="loc-btn px-3 py-1 rounded-full text-xs font-medium border">Rohrmoser</button>
     <button onclick="setLoc('Playa Grande')" class="loc-btn px-3 py-1 rounded-full text-xs font-medium border">Playa Grande</button>
     <button onclick="setLoc('LasCatalinas')" class="loc-btn px-3 py-1 rounded-full text-xs font-medium border">Las Catalinas</button>
   </div>
-  <div class="w-px h-5 bg-gray-200 hidden md:block"></div>
-  <!-- Año -->
-  <div class="flex items-center gap-2">
-    <span class="text-xs font-semibold text-gray-500">Año:</span>
-    <select id="filterYear" class="filter-select" onchange="renderAll()">
-      <option value="All">Todos</option>
-    </select>
+  <!-- Fila 2: Año + Mes + Restablecer -->
+  <div class="flex items-center gap-3 flex-wrap">
+    <div class="flex items-center gap-1.5">
+      <span class="text-xs font-semibold text-gray-500">Año:</span>
+      <select id="filterYear" class="filter-select" onchange="renderAll()">
+        <option value="All">Todos</option>
+      </select>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <span class="text-xs font-semibold text-gray-500">Mes:</span>
+      <select id="filterMonth" class="filter-select" onchange="renderAll()">
+        <option value="All">Todos</option>
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+    </div>
+    <button onclick="resetFilters()" class="text-xs px-3 py-1 rounded-full border text-green-700 hover:bg-green-50 ml-auto">↺ Restablecer</button>
   </div>
-  <!-- Mes -->
-  <div class="flex items-center gap-2">
-    <span class="text-xs font-semibold text-gray-500">Mes:</span>
-    <select id="filterMonth" class="filter-select" onchange="renderAll()">
-      <option value="All">Todos</option>
-      <option value="01">Enero</option><option value="02">Febrero</option>
-      <option value="03">Marzo</option><option value="04">Abril</option>
-      <option value="05">Mayo</option><option value="06">Junio</option>
-      <option value="07">Julio</option><option value="08">Agosto</option>
-      <option value="09">Septiembre</option><option value="10">Octubre</option>
-      <option value="11">Noviembre</option><option value="12">Diciembre</option>
-    </select>
-  </div>
-  <button onclick="resetFilters()" class="text-xs px-3 py-1 rounded-full border text-green-700 hover:bg-green-50 ml-auto">↺ Restablecer</button>
 </div>
 
 <!-- Navegación -->
-<nav class="bg-white border-b px-6 py-2 flex gap-2 flex-wrap flex-shrink-0">
-  <button onclick="showSection('overview')"  class="nav-btn active px-4 py-2 rounded-lg text-sm font-medium" id="nav-overview">Resumen</button>
-  <button onclick="showSection('pulse')"     class="nav-btn px-4 py-2 rounded-lg text-sm font-medium" id="nav-pulse">Pulso de Reseñas</button>
-  <button onclick="showSection('themes')"    class="nav-btn px-4 py-2 rounded-lg text-sm font-medium" id="nav-themes">Explorador de Temas</button>
-  <button onclick="showSection('insights')"  class="nav-btn px-4 py-2 rounded-lg text-sm font-medium" id="nav-insights">Insights Accionables</button>
-  <button onclick="showSection('social')"    class="nav-btn px-4 py-2 rounded-lg text-sm font-medium" id="nav-social">Señales Sociales</button>
+<nav class="bg-white border-b px-3 py-2 flex flex-wrap gap-1.5 flex-shrink-0">
+  <button onclick="showSection('overview')"  class="nav-btn active nav-tab" id="nav-overview">Resumen</button>
+  <button onclick="showSection('pulse')"     class="nav-btn nav-tab" id="nav-pulse">Pulso de Reseñas</button>
+  <button onclick="showSection('themes')"    class="nav-btn nav-tab" id="nav-themes">Explorador de Temas</button>
+  <button onclick="showSection('insights')"  class="nav-btn nav-tab" id="nav-insights">Insights Accionables</button>
+  <button onclick="showSection('social')"    class="nav-btn nav-tab" id="nav-social">Señales Sociales</button>
 </nav>
 
 <main class="px-4 py-6 max-w-7xl mx-auto w-full flex-grow">
@@ -257,35 +289,63 @@
 <section id="section-social" class="section">
   <div class="section-narrative">
     <h2>9 años de conversación en Instagram</h2>
-    <p><strong>1,715 publicaciones</strong> (2017–2026) y <strong>3,299 comentarios</strong> analizados. Usa el filtro de año y mes para explorar períodos específicos.</p>
+    <p><strong>1,715 publicaciones</strong> (2017–2026) y <strong>3,299 comentarios</strong> de <strong>@potsandbowls</strong>.</p>
+    <p class="mt-1 text-sm" style="opacity:0.85;">
+      📍 <strong>Datos a nivel de marca</strong> — Instagram no está separado por ubicación; el filtro de ubicación no aplica aquí.<br>
+      📅 Los filtros de <strong>año</strong> y <strong>mes</strong> actualizan todos los gráficos, KPIs y tablas.
+    </p>
   </div>
+
+  <!-- IG KPIs -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    <div class="card kpi">
+      <p class="text-xs text-gray-500 mb-1" id="igKpiPostsLabel">Publicaciones totales</p>
+      <p class="text-2xl font-bold text-green-800" id="igKpiPosts">—</p>
+    </div>
+    <div class="card kpi">
+      <p class="text-xs text-gray-500 mb-1" id="igKpiLikesLabel">Promedio de ❤️ por publicación</p>
+      <p class="text-2xl font-bold text-green-800" id="igKpiAvgLikes">—</p>
+    </div>
+    <div class="card kpi">
+      <p class="text-xs text-gray-500 mb-1" id="igKpiCmtLabel">Comentarios totales</p>
+      <p class="text-2xl font-bold text-green-800" id="igKpiCmts">—</p>
+    </div>
+    <div class="card kpi">
+      <p class="text-xs text-gray-500 mb-1" id="igKpiAvgCmtLabel">Promedio de 💬 por publicación</p>
+      <p class="text-2xl font-bold text-green-800" id="igKpiAvgCmts">—</p>
+    </div>
+  </div>
+
+  <!-- Charts -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
     <div class="card">
       <div class="narrative">
-        <div class="narrative-title">Análisis · Volumen de Publicaciones por Año</div>
-        <p>El volumen anual y el tipo de contenido revelan la consistencia de la estrategia. Una caída en publicaciones suele correlacionarse con menor alcance orgánico.</p>
-        <div class="insight-callout">💡 <span>Al menos 3–4 posts semanales es el mínimo para mantener al algoritmo activo.</span></div>
+        <div class="narrative-title" id="igVolumeNarrTitle">Análisis · Publicaciones por Año</div>
+        <p id="igVolumeNarrText">Cada barra muestra cuántas publicaciones se hicieron en ese período, desglosadas por tipo: Imagen, Video o Carrusel (álbum de fotos).</p>
+        <div class="insight-callout">💡 <span id="igVolumeInsight">Al menos 3–4 posts semanales es el mínimo para mantener el alcance orgánico activo.</span></div>
       </div>
-      <h3 class="font-semibold text-gray-700 mb-3">Publicaciones por Año y Tipo</h3>
+      <h3 class="font-semibold text-gray-700 mb-3" id="igYearChartTitle">Publicaciones por Año</h3>
       <canvas id="igYearChart"></canvas>
     </div>
     <div class="card">
       <div class="narrative">
-        <div class="narrative-title">Análisis · Formato Óptimo de Contenido</div>
-        <p>Carruseles generan mayor tiempo de visualización; videos amplían el alcance orgánico; imágenes reciben más likes directos.</p>
-        <div class="insight-callout">💡 <span>Si los videos son menos del 15% del contenido, hay oportunidad de crecer con más Reels.</span></div>
+        <div class="narrative-title">Análisis · ¿Qué tipo de contenido genera más likes?</div>
+        <p>Compara el promedio de likes por tipo de publicación. El formato con mayor promedio es el que más conecta con la audiencia en ese período.</p>
+        <div class="insight-callout">💡 <span>El formato ganador es el que hay que producir más.</span></div>
       </div>
-      <h3 class="font-semibold text-gray-700 mb-3">Desglose por Tipo de Publicación</h3>
+      <h3 class="font-semibold text-gray-700 mb-3" id="igTypeChartTitle">Promedio de ❤️ Likes por Tipo</h3>
       <canvas id="igTypeChart"></canvas>
     </div>
   </div>
+
+  <!-- Tables -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div class="card">
       <div class="narrative">
-        <div class="narrative-title">Análisis · Contenido de Mayor Impacto</div>
-        <p>Los posts con más likes son plantillas de éxito replicables. El filtro de año/mes muestra qué funcionó en cada período.</p>
+        <div class="narrative-title">Las publicaciones más populares del período</div>
+        <p>Ordenadas por número de likes. Son las que más resonaron con la audiencia — útiles como referencia para crear contenido similar.</p>
       </div>
-      <h3 class="font-semibold text-gray-700 mb-3">Publicaciones con más Me gusta</h3>
+      <h3 class="font-semibold text-gray-700 mb-3" id="igTopPostsTitle">Publicaciones con más Me gusta</h3>
       <div class="overflow-y-auto" style="max-height:320px;">
         <table class="w-full text-xs">
           <thead><tr class="border-b text-gray-500"><th class="pb-1 text-left">Fecha</th><th class="pb-1 text-left">Tipo</th><th class="pb-1">Me gusta</th><th class="pb-1">Comentarios</th></tr></thead>
@@ -295,9 +355,8 @@
     </div>
     <div class="card">
       <div class="narrative">
-        <div class="narrative-title">Análisis · Voz de la Comunidad</div>
-        <p>Los comentarios con más likes son testimonios auténticos. Úsalos en marketing con permiso del usuario.</p>
-        <div class="insight-callout">💡 <span>Los comentarios positivos más populares son publicidad gratuita.</span></div>
+        <div class="narrative-title">Los comentarios más populares del período</div>
+        <p>Los comentarios con más likes son la voz auténtica de la comunidad. Úsalos como testimoniales en marketing — con permiso del usuario.</p>
       </div>
       <h3 class="font-semibold text-gray-700 mb-3">Comentarios con más Me gusta</h3>
       <div class="overflow-y-auto" style="max-height:320px;" id="topCommentsList"></div>
@@ -309,17 +368,22 @@
 
 <!-- Chatbot Widget -->
 <div id="chatWidget">
-  <button id="chatToggle" onclick="toggleChat()" title="Asistente de análisis">💬</button>
+  <button id="chatToggle" onclick="toggleChat()" title="Asesor Inteligente de IA">💬</button>
   <div id="chatPanel">
     <div id="chatHeader">
       <div>
-        <div class="title">P&amp;B Insights</div>
-        <div class="sub">Asistente de inteligencia de negocios</div>
+        <div class="title">Pots &amp; Bowls</div>
+        <div class="sub">Asesor Inteligente de IA</div>
       </div>
       <button id="chatCloseBtn" onclick="toggleChat()">✕</button>
     </div>
     <div id="chatMessages">
-      <div class="cmsg cmsg-bot">¡Hola! Soy tu asistente de análisis. Puedo responder preguntas sobre calificaciones, temas de reseñas, estrategias de marketing o cualquier dato del dashboard. ¿En qué te ayudo?</div>
+      <div class="cmsg cmsg-bot">¡Hola! Este es el <strong>Asesor Inteligente de IA</strong> de Pots &amp; Bowls.<br><br>
+Analizo lo que tus clientes han dicho en reseñas y comentarios para ayudarte a:<br>
+• 🔍 <strong>Identificar problemas</strong> antes de que escalen<br>
+• 📈 <strong>Tomar mejores decisiones</strong> de operación y servicio<br>
+• 💰 <strong>Vender más</strong> destacando lo que más enamora a tus clientes<br><br>
+Pregúntame cualquier cosa sobre las reseñas, calificaciones o estrategia. ¿Por dónde empezamos?</div>
     </div>
     <div id="chatFooter">
       <div id="chatInputRow">
@@ -327,10 +391,10 @@
         <button id="chatSendBtn" onclick="sendChat()">➤</button>
       </div>
       <div id="chatSuggestions">
-        <button class="chat-sugg" onclick="useSugg(this)">¿Cuál es la debilidad más urgente?</button>
-        <button class="chat-sugg" onclick="useSugg(this)">¿Cómo mejorar Las Catalinas?</button>
-        <button class="chat-sugg" onclick="useSugg(this)">¿Qué publicar en Instagram?</button>
-        <button class="chat-sugg" onclick="useSugg(this)">Estrategia de precios</button>
+        <button class="chat-sugg" onclick="useSugg(this)">¿Cuál es el problema más urgente a resolver?</button>
+        <button class="chat-sugg" onclick="useSugg(this)">¿Qué dicen los clientes de Las Catalinas?</button>
+        <button class="chat-sugg" onclick="useSugg(this)">¿Qué podemos hacer para vender más?</button>
+        <button class="chat-sugg" onclick="useSugg(this)">¿Cuáles son los platos más populares?</button>
       </div>
     </div>
   </div>
@@ -340,7 +404,8 @@
 <footer>
   <img src="aae_logo.png" alt="AAE" style="filter:brightness(0) invert(1);"/>
   <p class="brand-name">Andrés Acosta Egea</p>
-  <p>Inteligencia de datos &amp; estrategia digital</p>
+  <p>+506 6278-8492</p>
+  <p>Sistemas Inteligentes</p>
 </footer>
 
 <script>
@@ -399,7 +464,9 @@ function filteredReviews(){
 // ─── Filter topPosts ───
 function filteredPosts(){
   const {yr,mo} = getFilters();
-  return DATA.topPosts.filter(p=>{
+  // Use topPostsAll (top 20/year) for year-filtered views; fall back to topPosts for no-filter
+  const src = (yr!=='All' || mo!=='All') ? (DATA.topPostsAll||DATA.topPosts) : (DATA.topPostsAll||DATA.topPosts);
+  return src.filter(p=>{
     if(!p.Date) return false;
     const py = p.Date.substring(0,4);
     const pm = p.Date.substring(5,7);
@@ -410,7 +477,8 @@ function filteredPosts(){
 // ─── Filter topComments ───
 function filteredComments(){
   const {yr,mo} = getFilters();
-  return DATA.topComments.filter(c=>{
+  const src = DATA.topCommentsAll||DATA.topComments;
+  return src.filter(c=>{
     if(!c.Date) return false;
     const cy = c.Date.substring(0,4);
     const cm = c.Date.substring(5,7);
@@ -468,15 +536,25 @@ function renderKPIs(){
   const avgStars = rows.length ? (rows.reduce((s,r)=>s+r.St,0)/total).toFixed(2) : '—';
   const pos = rows.filter(r=>r.Snt==='Positive').length;
   const posPct = rows.length ? (pos/total*100).toFixed(1) : '—';
-  // Posts count filtered
-  const postCount = filteredPosts().length;
-  const commentCount = filteredComments().length;
+  // Instagram counts — use engagement data (PostCount by year) for accuracy
+  const {yr: igYr} = getFilters();
+  const engData = DATA.instagramEngagement || [];
+  const igPostCount = igYr !== 'All'
+    ? engData.filter(e=>e.Year===igYr).reduce((s,e)=>s+parseInt(e.PostCount||0),0)
+    : DATA.meta.totalInstagramPosts;
+  // Comment counts by year not available in aggregated data — show total or label as approx
+  const igCommentCount = igYr !== 'All'
+    ? filteredComments().length || '—'
+    : DATA.meta.totalInstagramComments;
+  const igSub = igYr !== 'All'
+    ? `De ${igPostCount} publicaciones (${igYr})`
+    : `De ${DATA.meta.totalInstagramPosts.toLocaleString('es')} publicaciones`;
 
   const kpis=[
     {label:'Reseñas en período',  value:rows.length.toLocaleString('es'), sub:'Google + TripAdvisor'},
     {label:'Calificación Promedio',value:avgStars+' ★',                  sub:'En todas las fuentes'},
     {label:'Reseñas Positivas',   value:posPct+'%',                       sub:'Sentimiento 4+ estrellas'},
-    {label:'Comentarios Instagram',value:commentCount.toLocaleString('es'),sub:'De '+postCount+' publicaciones'},
+    {label:'Comentarios Instagram',value:typeof igCommentCount==='number'?igCommentCount.toLocaleString('es'):igCommentCount, sub:igSub},
   ];
   document.getElementById('kpiGrid').innerHTML=kpis.map(k=>`
     <div class="card kpi">
@@ -683,49 +761,169 @@ function renderInsights(){
 // Social signals
 // ═══════════════════════════════
 function renderSocial(){
-  const eng=DATA.instagramEngagement;
-  const {yr,mo}=getFilters();
-  const years=[...new Set(eng.map(d=>d.Year))].sort();
-  const types=[...new Set(eng.map(d=>d.Type))];
-  const typeColors={'Image':'#2d6a4f','Video':'#52b788','Sidecar':'#95d5b2','GraphSidecar':'#95d5b2'};
-  const typeLabels={'Image':'Imagen','Video':'Video','Sidecar':'Carrusel','GraphSidecar':'Carrusel'};
+  const eng        = DATA.instagramEngagement;
+  const igMonthly  = DATA.instagramMonthly  || [];
+  const cmtMonthly = DATA.instagramCommentsMonthly || [];
+  const {yr, mo}   = getFilters();
 
-  const datasets=types.map((tp,i)=>({
-    label:typeLabels[tp]||tp,
-    data:years.map(y=>{const r=eng.find(d=>d.Year===y&&d.Type===tp);return r?parseInt(r.PostCount):0;}),
-    backgroundColor:typeColors[tp]||COLORS[i],stack:'posts'
-  }));
+  const typeColors = {'Image':'#2d6a4f','Video':'#52b788','Sidecar':'#95d5b2','GraphSidecar':'#95d5b2'};
+  const typeLabels = {'Image':'Imagen','Video':'Video','Sidecar':'Carrusel','GraphSidecar':'Carrusel'};
+  const MESES      = {'01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio',
+                      '07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
+  const MESES_S    = {'01':'Ene','02':'Feb','03':'Mar','04':'Abr','05':'May','06':'Jun',
+                      '07':'Jul','08':'Ago','09':'Sep','10':'Oct','11':'Nov','12':'Dic'};
+  const TYPES      = ['Image','Video','Sidecar'];
+
+  // ── KPIs (from instagramMonthly — full dataset) ──────────────────────────
+  let mf = igMonthly;
+  if (yr !== 'All') mf = mf.filter(d => d.Year  === yr);
+  if (mo !== 'All') mf = mf.filter(d => d.Month === mo);
+
+  const kpiPosts     = mf.reduce((s,d) => s + d.PostCount,    0);
+  const kpiTotLikes  = mf.reduce((s,d) => s + d.TotalLikes,   0);
+  const kpiTotCmts   = mf.reduce((s,d) => s + d.TotalComments,0);
+  const kpiAvgLikes  = kpiPosts > 0 ? (kpiTotLikes  / kpiPosts).toFixed(1) : '—';
+  const kpiAvgCmts   = kpiPosts > 0 ? (kpiTotCmts   / kpiPosts).toFixed(1) : '—';
+
+  const periodLabel = mo !== 'All'
+    ? (yr !== 'All' ? `${MESES[mo]} ${yr}` : `${MESES[mo]} (todos los años)`)
+    : (yr !== 'All' ? yr : '2017–2026');
+
+  // Total comments = sum of the Comments column on posts published in this period
+  // (same source as the table, so the numbers are consistent)
+  const kpiCmtsOnPosts = mf.reduce((s,d) => s + d.TotalComments, 0);
+  const kpiAvgCmtsOnPosts = kpiPosts > 0 ? (kpiCmtsOnPosts / kpiPosts).toFixed(1) : '—';
+
+  document.getElementById('igKpiPostsLabel').textContent  = `Publicaciones · ${periodLabel}`;
+  document.getElementById('igKpiPosts').textContent       = kpiPosts.toLocaleString('es');
+  document.getElementById('igKpiLikesLabel').textContent  = 'Promedio ❤️ por publicación';
+  document.getElementById('igKpiAvgLikes').textContent    = kpiAvgLikes;
+  document.getElementById('igKpiCmtLabel').textContent    = `Comentarios recibidos · ${periodLabel}`;
+  document.getElementById('igKpiCmts').textContent        = kpiCmtsOnPosts > 0 ? kpiCmtsOnPosts.toLocaleString('es') : '—';
+  document.getElementById('igKpiAvgCmtLabel').textContent = 'Promedio 💬 por publicación';
+  document.getElementById('igKpiAvgCmts').textContent     = kpiAvgCmtsOnPosts;
+
+  // ── Chart 1: volume (instagramMonthly = datos completos) ─────────────────
+  let chartLabels, chartTitle, datasets, stacked = true;
+
+  if (yr === 'All' && mo === 'All') {
+    // By year
+    const years    = [...new Set(eng.map(d => d.Year))].sort();
+    chartLabels    = years;
+    chartTitle     = 'Publicaciones por Año';
+    const engTypes = [...new Set(eng.map(d => d.Type))];
+    datasets = engTypes.map((tp,i) => ({
+      label: typeLabels[tp]||tp,
+      data:  years.map(y => { const r=eng.find(d=>d.Year===y&&d.Type===tp); return r?parseInt(r.PostCount):0; }),
+      backgroundColor: typeColors[tp]||COLORS[i], stack:'posts'
+    }));
+
+  } else if (yr !== 'All' && mo === 'All') {
+    // By month within selected year
+    const rows  = igMonthly.filter(d => d.Year === yr).sort((a,b) => a.Month.localeCompare(b.Month));
+    chartLabels = rows.map(d => MESES_S[d.Month]||d.Month);
+    chartTitle  = `Publicaciones por mes · ${yr}`;
+    datasets = TYPES.map((tp,i) => ({
+      label: typeLabels[tp]||tp,
+      data:  rows.map(d => d[tp]||0),
+      backgroundColor: typeColors[tp]||COLORS[i], stack:'posts'
+    }));
+
+  } else if (yr !== 'All' && mo !== 'All') {
+    // Type breakdown for the specific month+year
+    const entry = igMonthly.find(d => d.Year === yr && d.Month === mo);
+    chartLabels = TYPES.map(tp => typeLabels[tp]||tp);
+    chartTitle  = `Tipo de publicación · ${MESES[mo]} ${yr}`;
+    stacked     = false;
+    datasets = [{
+      label: 'Publicaciones',
+      data:  TYPES.map(tp => entry ? (entry[tp]||0) : 0),
+      backgroundColor: TYPES.map((tp,i) => typeColors[tp]||COLORS[i])
+    }];
+
+  } else {
+    // yr=All, mo=specific: by year for that month
+    const rows  = igMonthly.filter(d => d.Month === mo).sort((a,b) => a.Year.localeCompare(b.Year));
+    chartLabels = rows.map(d => d.Year);
+    chartTitle  = `Publicaciones en ${MESES[mo]} por año`;
+    datasets = TYPES.map((tp,i) => ({
+      label: typeLabels[tp]||tp,
+      data:  rows.map(d => d[tp]||0),
+      backgroundColor: typeColors[tp]||COLORS[i], stack:'posts'
+    }));
+  }
+
+  document.getElementById('igYearChartTitle').textContent = chartTitle;
+
+  // Narrative for chart 1
+  const narrTitle   = document.getElementById('igVolumeNarrTitle');
+  const narrText    = document.getElementById('igVolumeNarrText');
+  const narrInsight = document.getElementById('igVolumeInsight');
+  if (yr === 'All' && mo === 'All') {
+    if(narrTitle)   narrTitle.textContent   = 'Análisis · Publicaciones por Año';
+    if(narrText)    narrText.textContent    = 'Cada barra muestra cuántas publicaciones se hicieron ese año, desglosadas por tipo: Imagen, Video o Carrusel (álbum de fotos). Una caída sostenida en volumen afecta el alcance orgánico.';
+    if(narrInsight) narrInsight.textContent = 'Al menos 3–4 posts semanales es el mínimo para mantener el alcance orgánico activo.';
+  } else if (yr !== 'All' && mo === 'All') {
+    if(narrTitle)   narrTitle.textContent   = `Análisis · ${yr} mes a mes`;
+    if(narrText)    narrText.textContent    = `Distribución mensual de los ${kpiPosts} posts publicados en ${yr}. Se puede ver en qué meses hubo más actividad y qué tipo de contenido predominó.`;
+    if(narrInsight) narrInsight.textContent = 'Los meses con menor actividad son oportunidades de mejora en el calendario editorial.';
+  } else if (yr !== 'All' && mo !== 'All') {
+    const entry = igMonthly.find(d => d.Year === yr && d.Month === mo);
+    if(narrTitle)   narrTitle.textContent   = `Análisis · ${MESES[mo]} ${yr}`;
+    if(narrText)    narrText.textContent    = `En ${MESES[mo]} de ${yr} se publicaron ${entry ? entry.PostCount : 0} posts. El gráfico muestra cuántos fueron Imagen, Video o Carrusel.`;
+    if(narrInsight) narrInsight.textContent = 'Carrusel = álbum de varias fotos o videos en un solo post.';
+  } else {
+    if(narrTitle)   narrTitle.textContent   = `Análisis · ${MESES[mo]} a través de los años`;
+    if(narrText)    narrText.textContent    = `Compara cuántos posts se publicaron cada año durante el mes de ${MESES[mo]}. Útil para detectar estacionalidad en la estrategia de contenido.`;
+    if(narrInsight) narrInsight.textContent = 'Si un mes siempre tiene menor actividad, es una oportunidad de planificación anticipada.';
+  }
+
   mkChart('igYearChart',{
-    type:'bar',data:{labels:years,datasets},
-    options:{plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}
+    type:'bar', data:{ labels:chartLabels, datasets },
+    options:{ plugins:{ legend:{ position:'bottom' } }, scales:{ x:{ stacked }, y:{ stacked, beginAtZero:true } } }
   });
 
-  const typeCounts=types.map(tp=>eng.filter(d=>d.Type===tp).reduce((s,d)=>s+parseInt(d.PostCount),0));
+  // ── Chart 2: avg likes per type (instagramEngagement, filtered by year) ──
+  const engF       = yr !== 'All' ? eng.filter(d => d.Year === yr) : eng;
+  const engTypes   = [...new Set(eng.map(d => d.Type))];
+  const avgByType  = engTypes.map(tp => {
+    const rows  = engF.filter(d => d.Type === tp);
+    const total = rows.reduce((s,d) => s + parseInt(d.PostCount||0), 0);
+    if (!total) return 0;
+    return Math.round(rows.reduce((s,d) => s + parseFloat(d.AvgLikes||0)*parseInt(d.PostCount||0), 0) / total);
+  });
+
+  document.getElementById('igTypeChartTitle').textContent =
+    yr !== 'All' ? `Promedio ❤️ por tipo · ${yr}` : 'Promedio ❤️ por tipo · 2017–2026';
+
   mkChart('igTypeChart',{
-    type:'doughnut',
-    data:{labels:types.map(tp=>typeLabels[tp]||tp),datasets:[{data:typeCounts,backgroundColor:COLORS}]},
-    options:{plugins:{legend:{position:'bottom'}}}
+    type:'bar',
+    data:{ labels:engTypes.map(tp=>typeLabels[tp]||tp), datasets:[{
+      label:'Promedio ❤️ Likes', data:avgByType,
+      backgroundColor:engTypes.map((tp,i)=>typeColors[tp]||COLORS[i])
+    }]},
+    options:{ indexAxis:'y', plugins:{ legend:{ display:false } }, scales:{ x:{ beginAtZero:true } } }
   });
 
-  // Filtered tables
-  const posts=filteredPosts().sort((a,b)=>parseInt(b.Likes)-parseInt(a.Likes)).slice(0,20);
-  document.getElementById('topPostsBody').innerHTML=posts.map(p=>`
+  // ── Tables (topPostsAll — most popular posts for the period) ─────────────
+  const tablePosts = filteredPosts().sort((a,b) => parseInt(b.Likes)-parseInt(a.Likes)).slice(0,20);
+  document.getElementById('topPostsBody').innerHTML = tablePosts.map(p=>`
     <tr class="border-b hover:bg-gray-50">
       <td class="py-1 pr-2">${p.Date?p.Date.substring(0,10):''}</td>
-      <td class="py-1 pr-2">${p.Type}</td>
+      <td class="py-1 pr-2">${typeLabels[p.Type]||p.Type}</td>
       <td class="py-1 pr-2 text-center font-bold">${parseInt(p.Likes).toLocaleString('es')}</td>
       <td class="py-1 text-center">${parseInt(p.Comments).toLocaleString('es')}</td>
-    </tr>`).join('')||'<tr><td colspan="4" class="py-4 text-center text-gray-400">Sin publicaciones para este período.</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="4" class="py-4 text-center text-gray-400">Sin publicaciones para este período.</td></tr>';
 
-  const comments=filteredComments().sort((a,b)=>parseInt(b.Likes)-parseInt(a.Likes)).slice(0,20);
-  document.getElementById('topCommentsList').innerHTML=comments.map(c=>`
+  const comments = filteredComments().sort((a,b) => parseInt(b.Likes)-parseInt(a.Likes)).slice(0,20);
+  document.getElementById('topCommentsList').innerHTML = comments.map(c=>`
     <div class="border-b py-2">
       <div class="flex justify-between">
         <span class="text-xs font-semibold text-gray-700">@${c.Username}</span>
         <span class="text-xs text-gray-400">${c.Likes} ❤ · ${c.Date}</span>
       </div>
       <p class="text-sm text-gray-600 mt-0.5">${c.CommentText}</p>
-    </div>`).join('')||'<p class="text-center text-gray-400 py-4">Sin comentarios para este período.</p>';
+    </div>`).join('') || '<p class="text-center text-gray-400 py-4">Sin comentarios para este período.</p>';
 }
 
 // ═══════════════════════════════
@@ -783,6 +981,17 @@ function useSugg(btn){
   sendChat();
 }
 
+function getReviewContext(filters){
+  if(!DATA.fullReviews) return [];
+  let reviews = DATA.fullReviews;
+  if(filters.loc && filters.loc !== 'All') reviews = reviews.filter(r => r.Loc === filters.loc);
+  if(filters.yr  && filters.yr  !== 'All') reviews = reviews.filter(r => r.Yr  === filters.yr);
+  if(filters.mo  && filters.mo  !== 'All') reviews = reviews.filter(r => r.Mo  === filters.mo);
+  // If no filter active, limit to 40 most recent to avoid huge payloads
+  if(reviews.length > 60) reviews = reviews.slice(0, 60);
+  return reviews.map(r => ({src: r.Src, st: r.St, snt: r.Snt, th: r.Th, tx: r.Tx}));
+}
+
 async function sendChat(){
   if(chatBusy) return;
   const input = document.getElementById('chatInput');
@@ -797,11 +1006,12 @@ async function sendChat(){
   appendMsg(msg, 'user');
   const typing = appendMsg('Analizando…', 'typing');
 
+  const filters = getFilters();
   try {
     const res = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({message: msg, history: chatHistory}),
+      body: JSON.stringify({message: msg, history: chatHistory, filters, reviews: getReviewContext(filters)}),
     });
     const data = await res.json();
     typing.remove();

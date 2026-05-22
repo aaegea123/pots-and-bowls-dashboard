@@ -1,0 +1,83 @@
+{
+  "google_maps": [
+    {
+      "location": "LasCatalinas",
+      "actorId": "nwua9Gu5YrADL7ZDj",
+      "input": {
+        "startUrls": [{"url": "https://www.google.com/maps/place/Pots+%26+Bowls+Las+Catalinas/@10.4824505,-85.7870588,17z/data=!3m1!4b1!4m6!3m5!1s0x8f9e25e6bae929f3:0x5ef9d96d237d0d2!8m2!3d10.4824505!4d-85.7870588!16s%2Fg%2F11pwmc6qvp?entry=ttu&g_ep=EgoyMDI2MDUxMC4wIKXMDSoASAFQAw%3D%3D"}],
+        "maxReviews": 200,
+        "reviewsSort": "newest",
+        "language": "en",
+        "scrapePlaceDetailPage": true,
+        "searchMatching": "all"
+      }
+    },
+    {
+      "location": "Rohrmoser",
+      "actorId": "nwua9Gu5YrADL7ZDj",
+      "input": {
+        "searchStringsArray": ["Pots & Bowls Rohrmoser"],
+        "locationQuery": "Rohrmoser, San José, Costa Rica",
+        "maxCrawledPlacesPerSearch": 1,
+        "maxReviews": 200,
+        "reviewsSort": "newest",
+        "language": "en",
+        "scrapePlaceDetailPage": true,
+        "searchMatching": "only_includes"
+      }
+    },
+    {
+      "location": "Playa Grande",
+      "actorId": "nwua9Gu5YrADL7ZDj",
+      "input": {
+        "searchStringsArray": ["Pots Bowls Playa Grande"],
+        "locationQuery": "Guanacaste, Costa Rica",
+        "maxCrawledPlacesPerSearch": 3,
+        "maxReviews": 200,
+        "reviewsSort": "newest",
+        "language": "en",
+        "scrapePlaceDetailPage": true,
+        "searchMatching": "all"
+      }
+    }
+  ],
+  "tripadvisor": [
+    {
+      "location": "LasCatalinas",
+      "actorId": "Hvp4YfFGyLM635Q2F",
+      "input": {
+        "startUrls": [{"url": "https://www.tripadvisor.com/Restaurant_Review-g6437168-d23822382-Reviews-Pots_Bowls_Las_Catalinas-Las_Catalinas_Province_of_Guanacaste.html"}],
+        "maxItemsPerQuery": 500,
+        "scrapeReviewerInfo": true,
+        "reviewRatings": ["ALL_REVIEW_RATINGS"],
+        "reviewsLanguages": ["ALL_REVIEW_LANGUAGES"]
+      }
+    },
+    {
+      "location": "Rohrmoser",
+      "actorId": "Hvp4YfFGyLM635Q2F",
+      "input": {
+        "startUrls": [{"url": "https://www.tripadvisor.com/Restaurant_Review-g309293-d26816241-Reviews-Pots_Bowls_Rohrmoser-San_Jose_San_Jose_Metro_Province_of_San_Jose.html"}],
+        "maxItemsPerQuery": 500,
+        "scrapeReviewerInfo": true,
+        "reviewRatings": ["ALL_REVIEW_RATINGS"],
+        "reviewsLanguages": ["ALL_REVIEW_LANGUAGES"]
+      }
+    }
+  ],
+  "instagram_posts": {
+    "actorId": "nH2AHrwxeTRJoN5hX",
+    "input": {
+      "username": ["potsandbowls"],
+      "resultsLimit": 2000,
+      "skipPinnedPosts": false,
+      "dataDetailLevel": "basicData"
+    }
+  },
+  "instagram_comments": {
+    "actorId": "SbK00X0JYCPblD2wp",
+    "recentPostsLimit": 25,
+    "commentsPerPost": 100,
+    "includeNestedComments": true
+  }
+}

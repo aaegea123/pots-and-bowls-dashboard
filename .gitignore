@@ -3,8 +3,11 @@
 Thumbs.db
 
 # Raw data files (large / sensitive)
-*.csv
 *.ps1
+
+# Ignore loose CSVs in root but NOT the master data/ folder
+*.csv
+!data/*.csv
 
 # Secrets — never commit these
 .env
@@ -13,3 +16,6 @@ Thumbs.db
 
 # Node
 node_modules/
+
+# Local Netlify folder
+.netlify
