@@ -1,0 +1,55 @@
+name: Monthly Data Refresh
+
+on:
+  schedule:
+    - cron: '0 7 1 * *'   # 1 AM Costa Rica (UTC-6) = 7 AM UTC, 1st of every month
+  workflow_dispatch:        # Manual trigger from GitHub Actions UI (for testing)
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60     # Apify runs can take 10-30 min; abort if stuck
+
+    permissions:
+      contents: write       # Needed to push data.js / data.json / last_scrape.json
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2. Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3. Run Apify scrapers and wait for completion
+      - name: Scrape fresh data via Apify
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+        run: python scripts/run_apify.py
+
+      # 4. Merge new data into master CSVs (dedup + append)
+      - name: Merge new data into master CSVs
+        run: python scripts/merge.py
+
+      # 5. Rebuild data.js and data.json from updated CSVs
+      - name: Rebuild data.js and data.json
+        run: python scripts/build.py
+
+      # 6. Commit and push - Netlify auto-deploys on push
+      - name: Commit updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.js data.json data/reviews.csv data/ig_posts.csv data/ig_comments.csv scripts/last_scrape.json
+          if git diff --staged --quiet; then
+            echo "No changes detected - skipping commit"
+          else
+            MONTH=$(date +'%Y-%m')
+            REVIEWS=$(python -c "import json; d=json.load(open('scripts/last_scrape.json')); print(d.get('reviews','?'))")
+            git commit -m "chore: monthly data refresh ${MONTH} (${REVIEWS} reviews)"
+            git push
+            echo "data.js + CSVs committed - Netlify will auto-deploy"
+          fi
