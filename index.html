@@ -81,7 +81,9 @@
   @media(max-width:639px){
     /* Widget closer to corner so panel has more room */
     #chatWidget{right:.75rem;bottom:.75rem;}
-    /* Panel becomes fixed & full-width on mobile — no more clipping */
+    /* Panel becomes fixed & full-width on mobile.
+       max-height uses dvh (dynamic viewport height) so the panel
+       automatically shrinks when the on-screen keyboard appears. */
     #chatPanel{
       position:fixed;
       bottom:72px;
@@ -90,9 +92,16 @@
       width:auto;
       max-width:none;
       border-radius:14px;
+      max-height:calc(100dvh - 80px);
     }
-    /* Slightly shorter message area to leave room for keyboard */
-    #chatMessages{height:220px;}
+    /* Messages area: flex-grow so it fills available space and
+       shrinks gracefully when the keyboard reduces the viewport */
+    #chatMessages{
+      flex:1;
+      height:auto;
+      min-height:60px;
+      max-height:220px;
+    }
     /* Suggestion chips: smaller & tighter so they wrap in 2 per row */
     .chat-sugg{font-size:.68rem;padding:.18rem .55rem;}
     #chatSuggestions{gap:.25rem;padding:.3rem .5rem .45rem;}
