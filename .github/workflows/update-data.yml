@@ -38,7 +38,7 @@ jobs:
       - name: Rebuild data.js and data.json
         run: python scripts/build.py
 
-      # 6. Commit and push - Netlify auto-deploys on push
+      # 6. Commit and push
       - name: Commit updated data
         run: |
           git config user.name  "github-actions[bot]"
@@ -51,5 +51,14 @@ jobs:
             REVIEWS=$(python -c "import json; d=json.load(open('scripts/last_scrape.json')); print(d.get('reviews','?'))")
             git commit -m "chore: monthly data refresh ${MONTH} (${REVIEWS} reviews)"
             git push
-            echo "data.js + CSVs committed - Netlify will auto-deploy"
+            echo "data.js + CSVs committed"
           fi
+
+      # 7. Deploy to Netlify (always runs, picks up latest built files)
+      - name: Deploy updated site to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          npm install -g netlify-cli --silent
+          netlify deploy --prod --dir=. --site=8e959157-562f-4c83-8e72-a5270ca284e5
+          echo "Netlify deployment triggered"
